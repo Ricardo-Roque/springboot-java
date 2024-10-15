@@ -1,5 +1,6 @@
 package org.example.course.services;
 
+import jakarta.persistence.EntityNotFoundException;
 import org.example.course.entities.User;
 import org.example.course.repositories.UserRepository;
 import org.example.course.services.exceptions.DatabaseException;
@@ -42,9 +43,14 @@ public class UserService {
     }
 
     public User update(Long id, User user) {
-        User entity = userRepository.getReferenceById(id);
-        updateData(entity, user);
-        return userRepository.save(entity);
+        try {
+            User entity = userRepository.getReferenceById(id);
+            updateData(entity, user);
+            return userRepository.save(entity);
+        } catch (EntityNotFoundException e) {
+            throw new ResourceNotFoundException(id);
+        }
+
     }
 
     private void updateData(User entity, User user) {
